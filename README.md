@@ -4,7 +4,7 @@ Simple Slack Logging for Django
 
 Install
 ```pip
-pip install git+https://github.com/Innovate-Inc/django-slack-logging#egg=django-slack-logging
+pip install git+https://github.com/Innovate-Inc/django-slack-logging.git#egg=django-slack-logging
 ```
 
 Update Django logging settings
