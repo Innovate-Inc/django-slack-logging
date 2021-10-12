@@ -16,7 +16,7 @@ LOGGING = {
         'level': 'ERROR',
         'filters': ['require_debug_false'],
         'class': 'slack_logging.SlackExceptionHandler',
-        'webhook_url': os.environ.get('SLACK_WEBHOOK_URL', '')
+        'webhook_url': '<webhook.url>'
     }
 }
 ```
