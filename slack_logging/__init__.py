@@ -3,53 +3,28 @@ from copy import copy
 from django.conf import settings
 from django.utils.log import AdminEmailHandler
 from django.views.debug import ExceptionReporter
+from logging import Handler
+from io import StringIO
 
 
 class SlackExceptionHandler(AdminEmailHandler):
-    def __init__(self, webhook_url):
-        self.webhook_url = webhook_url
+    def __init__(self, bot_token, channel_id):
+        self.bot_token = bot_token
+        self.channel_id = channel_id
         super(SlackExceptionHandler, self).__init__()
 
-    def emit(self, record, *args, **kwargs):
+    def emit(self, record):
         try:
-            request = record.request
-            subject = '%s (%s IP): %s' % (
-                record.levelname,
-                ('internal' if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
-                 else 'EXTERNAL'),
-                record.getMessage()
-            )
+            if record.request and not record.request.user.is_anonymous:
+                user = record.request.user
+            else:
+                user = 'Unknown'
+
+            msg = self.format(record)
+            requests.post("https://slack.com/api/chat.postMessage", headers={"Authorization": f"Bearer {self.bot_token}"},
+                          data={"text": f"{record.levelname.title()} experienced by {user}", "channel": self.channel_id})
+            requests.post("https://slack.com/api/files.upload", headers={"Authorization": f"Bearer {self.bot_token}"},
+                          data={"content": msg, "channels": self.channel_id, "filetype": "python", "filename": "traceback.py"})
+
         except Exception:
-            subject = '%s: %s' % (
-                record.levelname,
-                record.getMessage()
-            )
-            request = None
-        subject = self.format_subject(subject)
-
-        no_exc_record = copy(record)
-        no_exc_record.exc_info = None
-        no_exc_record.exc_text = None
-
-        if record.exc_info:
-            exc_info = record.exc_info
-        else:
-            exc_info = (None, record.getMessage(), None)
-
-        reporter = ExceptionReporter(request, is_email=True, *exc_info)
-        end_of_trace = reporter.get_traceback_data()['frames'][-1]
-        message = '\n'.join(["{} {}".format(exc_info[0].__name__, exc_info[1]),
-                             "{} line: {}".format(end_of_trace['filename'], str(end_of_trace['lineno']))])
-
-        attachments = [
-            {
-                'title': subject,
-                'color': 'danger',
-                'text': message
-            }
-        ]
-
-        data = {'attachments': attachments}
-
-        # send it
-        requests.post(self.webhook_url, json=data)
+            self.handleError(record)
