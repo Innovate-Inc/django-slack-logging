@@ -1,13 +1,8 @@
 import requests
-from copy import copy
-from django.conf import settings
-from django.utils.log import AdminEmailHandler
-from django.views.debug import ExceptionReporter
 from logging import Handler
-from io import StringIO
 
 
-class SlackExceptionHandler(AdminEmailHandler):
+class SlackExceptionHandler(Handler):
     def __init__(self, bot_token, channel_id):
         self.bot_token = bot_token
         self.channel_id = channel_id
