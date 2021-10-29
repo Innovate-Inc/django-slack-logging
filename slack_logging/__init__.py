@@ -10,11 +10,13 @@ class SlackExceptionHandler(Handler):
 
     def emit(self, record):
         try:
-            if record.request and not record.request.user.is_anonymous:
+
+            if hasattr(record, 'request') and not record.request.user.is_anonymous:
                 user = record.request.user
+            elif record.pathname == 'manage.py':
+                user = 'management command'
             else:
                 user = 'Unknown'
-
             msg = self.format(record)
             requests.post("https://slack.com/api/chat.postMessage", headers={"Authorization": f"Bearer {self.bot_token}"},
                           data={"text": f"{record.levelname.title()} experienced by {user}", "channel": self.channel_id})
