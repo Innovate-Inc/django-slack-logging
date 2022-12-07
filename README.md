@@ -21,3 +21,6 @@ LOGGING = {
 }
 ```
 
+Set proper scope on bot token at api.slack.com
+Under your app: Features > Oauth & Permissions > Scope > Bot Token Scopes
+Add: chat:write, chat:write.customize, files:write
