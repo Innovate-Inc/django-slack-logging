@@ -1,6 +1,6 @@
 import requests
 from logging import Handler
-
+from urllib.parse import urlencode
 
 class SlackExceptionHandler(Handler):
     def __init__(self, bot_token, channel_id):
@@ -13,10 +13,15 @@ class SlackExceptionHandler(Handler):
 
             if hasattr(record, 'request') and not record.request.user.is_anonymous:
                 user = record.request.user
+                if record.request.GET:
+                    params = urlencode(record.request.GET)
+                    record.msg += '?%s'
+                    record.args = record.args + (params,)
             elif record.pathname == 'manage.py':
                 user = 'management command'
             else:
                 user = 'Unknown'
+
             msg = self.format(record)
             requests.post("https://slack.com/api/chat.postMessage", headers={"Authorization": f"Bearer {self.bot_token}"},
                           data={"text": f"{record.levelname.title()} experienced by {user}", "channel": self.channel_id})
