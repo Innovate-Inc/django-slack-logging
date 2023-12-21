@@ -3,8 +3,8 @@ from setuptools import setup
 setup(
     name='django-slack-logging',
     version='1.0.0',
-    packages=['slack_logging'],
-    install_requires=['requests'],
+    packages=['slack_logging', 'ms_teams_logging'],
+    install_requires=['requests', 'pymsteams'],
     url='',
     license='',
     author='Travis Bock',
