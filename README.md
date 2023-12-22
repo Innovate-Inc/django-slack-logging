@@ -16,7 +16,8 @@ LOGGING = {
         'level': 'ERROR',
         'filters': ['require_debug_false'],
         'class': 'slack_logging.SlackExceptionHandler',
-        'webhook_url': '<webhook.url>'
+        'bot_token': '<bot_token>',
+        'channel_id': '<channel_id>'
     }
 }
 ```
