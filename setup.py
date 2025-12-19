@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='django-slack-logging',
-    version='1.0.0',
+    version='1.1.0',
     packages=['slack_logging', 'ms_teams_logging'],
     install_requires=['requests', 'pymsteams'],
     url='',
