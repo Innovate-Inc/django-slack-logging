@@ -31,7 +31,7 @@ class SlackExceptionHandler(Handler):
             file_id = r.json()["file_id"]
             requests.post(upload_url, files={"file": ("traceback.py", msg)})
             requests.post("POST https://slack.com/api/files.completeUploadExternal", headers={"Authorization": f"Bearer {self.bot_token}"},
-                          data={"files": [{"id": file_id, "title": "traceback.py"}], "channel_id": self.channel_id})
+                          json={"files": [{"id": file_id, "title": "traceback.py"}], "channel_id": self.channel_id})
 
         except Exception:
             self.handleError(record)
